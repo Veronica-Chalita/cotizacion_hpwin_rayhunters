@@ -14,7 +14,7 @@
     'category': 'Custom Development',
 
     # any module necessary for this one to work correctly
-    'depends': ['sale_management','account'],
+    'depends': ['sale_management','account','account_accountant'],
 
     # always loaded
     'data': [
