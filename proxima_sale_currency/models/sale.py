@@ -13,12 +13,12 @@ class SaleOrder(models.Model):
             if currency_value:
                 record.currency_rate = 1/currency_value
     
-    @api.model
-    def _prepare_invoice(self):
-        res = super(SaleOrder,self)._prepare_invoice()
-        company_currency = self.env.ref('base.main_company').currency_id
-        res.update({'currency_id':company_currency})
-        return res
+    # @api.model
+    # def _prepare_invoice(self):
+    #     res = super(SaleOrder,self)._prepare_invoice()
+    #     company_currency = self.env.ref('base.main_company').currency_id
+    #     res.update({'currency_id':company_currency})
+    #     return res
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -28,7 +28,13 @@ class SaleOrderLine(models.Model):
     def _compute_price_mxn(self):
         for line in self:
             if line.order_id.state in ['draft','sent','sale','cancel']:
-                line.unitprice_mxn = line.price_unit * line.order_id.currency_rate
+                if line.order_id.multi_currency == True:
+                    line.unitprice_mxn = line.price_unit * line.order_id.currency_rate
+                else:
+                    if line.order_id.currency_id.id == 2:
+                        line.unitprice_mxn = line.price_unit
+                    else:
+                        line.unitprice_mxn = line.unitprice_mxn
 
     @api.model
     def _prepare_invoice_line(self):
