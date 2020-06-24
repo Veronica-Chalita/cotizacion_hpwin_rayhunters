@@ -1,4 +1,4 @@
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -31,9 +31,9 @@ class SaleOrderLine(models.Model):
         for line in self:
             if line.order_id.state in ['draft','sent','sale','cancel']:
                 if line.order_id.multi_currency == True:
-                    line.unitprice_mxn = line.price_unit * line.order_id.currency_rate
+                    line['unitprice_mxn'] = line.price_unit * line.order_id.currency_rate
                 else:
-                    line.unitprice_mxn = line.price_unit
+                    line['unitprice_mxn'] = line.price_unit
 
     @api.model
     def _prepare_invoice_line(self):
