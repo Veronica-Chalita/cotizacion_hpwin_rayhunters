@@ -26,14 +26,13 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
     unitprice_mxn = fields.Float("Unit Price MXN",compute='_compute_price_mxn')
 
-    @api.depends('price_unit','order_id.state','order_id.currency_rate','order_id.multi_currency')
+    @api.depends('price_unit','order_id.currency_rate','order_id.multi_currency')
     def _compute_price_mxn(self):
         for order_line in self:
-            if order_line.order_id.state in ['draft','sent','sale','cancel']:
-                if order_line.order_id.multi_currency == True:
-                    order_line['unitprice_mxn'] = order_line.price_unit * order_line.order_id.currency_rate
-                else:
-                    order_line['unitprice_mxn'] = order_line.price_unit
+            if order_line.order_id.multi_currency == True:
+                order_line['unitprice_mxn'] = order_line.price_unit * order_line.order_id.currency_rate
+            else:
+                order_line['unitprice_mxn'] = order_line.price_unit
 
     @api.model
     def _prepare_invoice_line(self):
