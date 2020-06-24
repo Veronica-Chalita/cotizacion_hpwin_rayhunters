@@ -5,13 +5,12 @@ class SaleOrder(models.Model):
     currency_rate = fields.Float(string='Quotation Currency Rate',compute='_get_currency_rate',store=False)
     multi_currency = fields.Boolean(string="Enable Multi Currency",default=False)
    
-    @api.depends('date_order')
+    @api.depends('date_order','company_id','currency_id')
     def _get_currency_rate(self):
-        currency_id = self.env['res.currency'].search([('name', '=', 'USD')]).id
-        currency_value = self.env['res.currency.rate'].search([('currency_id','=',currency_id),('name','=',self.date_order)]).rate
-        for record in self:
-            if currency_value:
-                record.currency_rate = 1/currency_value
+        currency_usd = self.env.ref('base.USD')
+        for order in self:
+            order_currency = order.currency_id or order.company_id.currency_id
+            order['currency_rate'] = self.env['res.currency']._get_conversion_rate(currency_usd,order_currency,order.company_id, order.date_order)
     
     @api.model
     def _prepare_invoice(self):

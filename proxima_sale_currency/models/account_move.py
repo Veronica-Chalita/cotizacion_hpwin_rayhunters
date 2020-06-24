@@ -1,4 +1,4 @@
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
