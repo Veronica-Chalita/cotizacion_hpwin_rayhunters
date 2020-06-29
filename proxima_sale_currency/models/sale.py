@@ -1,9 +1,13 @@
+# -*- coding: utf-8 -*-
+
 from odoo import api, fields, models
+
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
-    currency_rate = fields.Float(string='Quotation Currency Rate',compute='_get_currency_rate',store=False)
-    multi_currency = fields.Boolean(string="Enable Multi Currency",default=False)
+
+    currency_rate = fields.Float(string='Quotation Currency Rate', compute='_get_currency_rate', store=False)
+    multi_currency = fields.Boolean(string='Enable Multi Currency', default=False)
    
     @api.depends('date_order', 'company_id', 'currency_id')
     def _get_currency_rate(self):
@@ -20,9 +24,11 @@ class SaleOrder(models.Model):
             res.update({'currency_id':self.company_id.currency_id})
         return res
 
+
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
-    unitprice_mxn = fields.Float("Unit Price MXN",compute='_compute_price_mxn')
+    
+    unitprice_mxn = fields.Float('Unit Price MXN', compute='_compute_price_mxn')
 
     @api.depends('price_unit','order_id.currency_rate','order_id.multi_currency')
     def _compute_price_mxn(self):
