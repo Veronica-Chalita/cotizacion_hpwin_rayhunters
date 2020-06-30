@@ -19,9 +19,9 @@ class SaleOrder(models.Model):
     def _prepare_invoice(self):
         res = super(SaleOrder, self)._prepare_invoice()
         if self.multi_currency:
-            res.update({'currency_id':self.currency_id})
-        else:
             res.update({'currency_id':self.company_id.currency_id})
+        else:
+            res.update({'currency_id':self.currency_id})
         return res
 
 
