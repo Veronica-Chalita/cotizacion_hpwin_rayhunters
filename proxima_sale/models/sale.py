@@ -29,6 +29,7 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
     
     unitprice_mxn = fields.Float('Unit Price MXN', compute='_compute_price_mxn')
+    price_subtotal = fields.Monetary(compute='_compute_amount_mxn', string='Subtotal', readonly=True, store=True)
 
     @api.depends('price_unit', 'order_id.currency_rate', 'order_id.multi_currency')
     def _compute_price_mxn(self):
@@ -37,6 +38,29 @@ class SaleOrderLine(models.Model):
                 order_line.unitprice_mxn = order_line.price_unit * order_line.order_id.currency_rate
             else:
                 order_line.unitprice_mxn = order_line.price_unit
+
+    @api.depends('unitprice_mxn', 'product_uom_qty', 'order_id.multi_currency', 'price_unit', 'tax_id', 'discount')
+    def _compute_amount_mxn(self):
+        for line in self:
+            if line.order_id.multi_currency:
+                price = line.unitprice_mxn * (1 - (line.discount or 0.0) / 100.0)
+            else:
+                price = line.unitprice_mxn * (1 - (line.discount or 0.0) / 100.0)
+            taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.order_id.partner_shipping_id)
+            line.update({
+                'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
+                'price_total': taxes['total_included'],
+                'price_subtotal': taxes['total_excluded'],
+            })
+            if self.env.context.get('import_file', False) and not self.env.user.user_has_groups('account.group_account_manager'):
+                line.tax_id.invalidate_cache(['invoice_repartition_line_ids'], [line.tax_id.id])
+    
+    @api.onchange('product_id', 'price_unit', 'tax_id', 'discount', 'product_uom_qty')
+    def _onchange_line_mxn(self):
+        for line in self:
+            if line.order_id.multi_currency:
+                 line._compute_amount_mxn()
+            return
 
     @api.model
     def _prepare_invoice_line(self):
