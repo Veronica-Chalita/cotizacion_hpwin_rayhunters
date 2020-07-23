@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Comercializadora Proxima',
-    'summary': 'Comercializadora Proxima',
+    'name': 'Comercializadora Proxima: Multi Currency Quotations',
+    'summary': 'Multi Currency rate on quotations to invoice',
     'sequence': 100,
     'license': 'OEEL-1',
     'website': 'https://www.odoo.com',

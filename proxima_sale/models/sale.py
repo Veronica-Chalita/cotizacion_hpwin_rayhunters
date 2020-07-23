@@ -28,8 +28,8 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
     
-    unitprice_mxn = fields.Float('Unit Price MXN', compute='_compute_price_mxn')
-    price_subtotal = fields.Monetary(compute='_compute_amount_mxn', string='Subtotal', readonly=True, store=True)
+    unitprice_mxn = fields.Float(string='Unit Price MXN', compute='_compute_price_mxn')
+    price_subtotal = fields.Monetary(string='Subtotal', compute='_compute_amount_mxn', readonly=True, store=True)
 
     @api.depends('price_unit', 'order_id.currency_rate', 'order_id.multi_currency')
     def _compute_price_mxn(self):
