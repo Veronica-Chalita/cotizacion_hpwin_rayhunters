@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record id="view_order_form_inherit_proxima" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.proxima</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+          <xpath expr="//field[@name='payment_term_id']" position="after">
+            <field name="multi_currency"/>
+            <field name="currency_rate" attrs="{'invisible':[('multi_currency','=', False)]}"/>
+          </xpath>
+          <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="after">
+            <field name="unitprice_mxn" attrs="{'column_invisible':[('parent.multi_currency','=', False)]}"/>
+          </xpath>
+        </field>
+    </record>
+  </data>
+</odoo>
